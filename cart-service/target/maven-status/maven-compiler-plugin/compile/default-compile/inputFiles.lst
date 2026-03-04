@@ -1,20 +1,17 @@
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\CartServiceApplication.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\config\WebConfig.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\controller\CartController.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\dtos\AddToCartRequest.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\dtos\CartItemResponse.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\dtos\CartResponse.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\dtos\ProductDTO.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\dtos\UpdateCartItemRequest.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\exceptions\CartException.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\exceptions\GlobalExceptionHandler.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\exceptions\ResourceNotFoundException.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\mapper\CartMapper.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\model\Cart.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\model\CartItem.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\repository\CartItemRepository.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\repository\CartRepository.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\response\ApiResponse.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\service\CartService.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\service\ProductServiceClient.java
-D:\NSBM\4 year\DEA\swift-cart\cart-service\src\main\java\com\swiftcart\cart_service\service\ProductServiceClientFallback.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\CartServiceApplication.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\client\ProductClient.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\client\ProductResponse.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\config\WebConfig.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\controller\CartController.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\dtos\AddToCartRequest.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\dtos\CartItemResponse.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\dtos\CartResponse.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\exceptions\CartException.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\exceptions\GlobalExceptionHandler.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\exceptions\ResourceNotFoundException.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\mapper\CartMapper.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\model\Cart.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\model\CartItem.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\repository\CartRepository.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\response\ApiResponse.java
+F:\cart-service\cart-service\src\main\java\com\swiftcart\cart_service\service\CartService.java

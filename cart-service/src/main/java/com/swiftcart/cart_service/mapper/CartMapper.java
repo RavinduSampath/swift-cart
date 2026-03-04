@@ -6,31 +6,36 @@ import com.swiftcart.cart_service.model.Cart;
 import com.swiftcart.cart_service.model.CartItem;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class CartMapper {
 
-    public CartResponse toCartResponse(Cart cart) {
-        CartResponse response = new CartResponse();
-        response.setId(cart.getId());
-        response.setUserId(cart.getUserId());
-        response.setItems(cart.getItems().stream()
-                .map(this::toCartItemResponse)
-                .collect(Collectors.toList()));
-        response.setTotalCartValue(cart.getTotalCartValue());
-        return response;
+    public CartResponse toResponse(Cart cart) {
+        List<CartItemResponse> itemResponses = cart.getItems().stream()
+                .map(this::toItemResponse)
+                .collect(Collectors.toList());
+
+        return new CartResponse(
+                cart.getId(),
+                cart.getUserId(),
+                itemResponses,
+                cart.getTotalCartValue()
+        );
     }
 
-    public CartItemResponse toCartItemResponse(CartItem cartItem) {
-        CartItemResponse response = new CartItemResponse();
-        response.setId(cartItem.getId());
-        response.setProductId(cartItem.getProductId());
-        response.setProductName(cartItem.getProductName());
-        response.setUnitPrice(cartItem.getUnitPrice());
-        response.setQuantity(cartItem.getQuantity());
-        response.setTotalPrice(cartItem.getTotalPrice());
-        response.setSelectedStrap(cartItem.getSelectedStrap());
-        return response;
+    private CartItemResponse toItemResponse(CartItem item) {
+        BigDecimal subTotal = item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+
+        return new CartItemResponse(
+                item.getId(),
+                item.getProductId(),
+                item.getProductName(),
+                item.getQuantity(),
+                item.getUnitPrice(),
+                subTotal
+        );
     }
 }

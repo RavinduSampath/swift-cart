@@ -1,161 +1,105 @@
 package com.swiftcart.cart_service.service;
 
+import com.swiftcart.cart_service.client.ProductClient;
+import com.swiftcart.cart_service.client.ProductResponse;
 import com.swiftcart.cart_service.dtos.AddToCartRequest;
 import com.swiftcart.cart_service.dtos.CartResponse;
-import com.swiftcart.cart_service.dtos.ProductDTO;
-import com.swiftcart.cart_service.dtos.UpdateCartItemRequest;
 import com.swiftcart.cart_service.exceptions.ResourceNotFoundException;
 import com.swiftcart.cart_service.mapper.CartMapper;
 import com.swiftcart.cart_service.model.Cart;
 import com.swiftcart.cart_service.model.CartItem;
 import com.swiftcart.cart_service.repository.CartRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import com.swiftcart.cart_service.response.ApiResponse;
+import feign.FeignException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final ProductServiceClient productServiceClient;
+    private final ProductClient productClient;
     private final CartMapper cartMapper;
 
-    @Transactional(readOnly = true)
+    public CartService(CartRepository cartRepository, ProductClient productClient, CartMapper cartMapper) {
+        this.cartRepository = cartRepository;
+        this.productClient = productClient;
+        this.cartMapper = cartMapper;
+    }
+
     public CartResponse getCartByUserId(Long userId) {
         Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", "userId", userId));
-        return cartMapper.toCartResponse(cart);
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user ID: " + userId));
+        return cartMapper.toResponse(cart);
     }
 
     @Transactional
-    public CartResponse addItemToCart(Long userId, AddToCartRequest request) {
-        // Get or create cart for user
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseGet(() -> {
-                    Cart newCart = new Cart();
-                    newCart.setUserId(userId);
-                    return cartRepository.save(newCart);
-                });
+    public CartResponse addItemToCart(AddToCartRequest request) {
+        // 1. Fetch or create a cart for the user
+        Cart cart = cartRepository.findByUserId(request.userId()).orElseGet(() -> {
+            Cart newCart = new Cart();
+            newCart.setUserId(request.userId());
+            return newCart;
+        });
 
-        // Fetch product details from product service with manual fallback
-        ProductDTO product;
+        // Call Product Service via Feign to verify product and get details
+        ProductResponse product;
         try {
-            product = productServiceClient.getProductById(request.getProductId());
-            log.info("Successfully fetched product from product service: {}", request.getProductId());
-        } catch (Exception e) {
-            log.warn("Product service unavailable, using mock product for ID: {}", request.getProductId(), e);
-            // Manual fallback - create mock product
-            product = new ProductDTO();
-            product.setId(request.getProductId());
-            product.setName("Mock Product " + request.getProductId());
-            product.setPrice(BigDecimal.valueOf(99.99));
-            product.setDescription("This is a mock product for testing");
-            product.setStockQuantity(100);
-            product.setCategory("Test Category");
+            ApiResponse<ProductResponse> response = productClient.getProductById(request.productId());
+            product = response.getData();
+        } catch (FeignException.NotFound e) {
+            throw new ResourceNotFoundException("Cannot add to cart: Product ID " + request.productId() + " does not exist.");
         }
 
-        // Check if product already exists in cart (with same customization if applicable)
-        CartItem existingItem = cart.getItems().stream()
-                .filter(item -> item.getProductId().equals(request.getProductId())
-                        && (request.getSelectedStrap() == null || request.getSelectedStrap().equals(item.getSelectedStrap())))
-                .findFirst()
-                .orElse(null);
+        // Convert the Double price from Product Service to a BigDecimal
+        BigDecimal itemPrice = BigDecimal.valueOf(product.price());
 
-        if (existingItem != null) {
-            // Update quantity if item already exists
-            existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
-            existingItem.calculateTotalPrice();
+        // Check if the item is already in the cart
+        Optional<CartItem> existingItem = cart.getItems().stream()
+                .filter(item -> item.getProductId().equals(request.productId()))
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+            // If it exists, just increase the quantity
+            CartItem item = existingItem.get();
+            item.setQuantity(item.getQuantity() + request.quantity());
         } else {
-            // Create new cart item
+            // If it's new, create a new CartItem
             CartItem newItem = new CartItem();
-            newItem.setProductId(product.getId());
-            newItem.setProductName(product.getName());
-            newItem.setUnitPrice(product.getPrice());
-            newItem.setQuantity(request.getQuantity());
-            newItem.setSelectedStrap(request.getSelectedStrap());
-            newItem.calculateTotalPrice();
+            newItem.setCart(cart);
+            newItem.setProductId(product.id());
+            newItem.setProductName(product.brand() + " " + product.modelName());
+            newItem.setUnitPrice(itemPrice);
+            newItem.setQuantity(request.quantity());
             cart.getItems().add(newItem);
         }
 
-        // Recalculate cart total
-        cart.calculateTotalCartValue();
-        cart = cartRepository.save(cart);
+        // 4. Recalculate the total cart value
+        recalculateTotal(cart);
 
-        return cartMapper.toCartResponse(cart);
-    }
-
-    @Transactional
-    public CartResponse updateCartItem(Long userId, Long itemId, UpdateCartItemRequest request) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", "userId", userId));
-
-        // Reload cart to ensure items have IDs
-        cart = cartRepository.findById(cart.getId()).orElseThrow();
-
-        boolean itemFound = false;
-        for (CartItem item : cart.getItems()) {
-            if (item.getId() != null && item.getId().equals(itemId)) {
-                item.setQuantity(request.getQuantity());
-                item.calculateTotalPrice();
-                itemFound = true;
-                break;
-            }
-        }
-
-        if (!itemFound) {
-            throw new ResourceNotFoundException("CartItem", "id", itemId);
-        }
-
-        cart.calculateTotalCartValue();
-        cart = cartRepository.save(cart);
-
-        return cartMapper.toCartResponse(cart);
-    }
-
-    @Transactional
-    public CartResponse removeItemFromCart(Long userId, Long itemId) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", "userId", userId));
-
-        // Reload cart to ensure items have IDs
-        cart = cartRepository.findById(cart.getId()).orElseThrow();
-
-        CartItem itemToRemove = null;
-        for (CartItem item : cart.getItems()) {
-            if (item.getId() != null && item.getId().equals(itemId)) {
-                itemToRemove = item;
-                break;
-            }
-        }
-
-        if (itemToRemove == null) {
-            throw new ResourceNotFoundException("CartItem", "id", itemId);
-        }
-
-        cart.getItems().remove(itemToRemove);
-        cart.calculateTotalCartValue();
-        cart = cartRepository.save(cart);
-
-        return cartMapper.toCartResponse(cart);
+        // 5. Save and return
+        Cart savedCart = cartRepository.save(cart);
+        return cartMapper.toResponse(savedCart);
     }
 
     @Transactional
     public void clearCart(Long userId) {
         Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user ID: " + userId));
 
         cart.getItems().clear();
-        cart.calculateTotalCartValue();
+        cart.setTotalCartValue(BigDecimal.ZERO);
         cartRepository.save(cart);
     }
 
-    @Transactional
-    public void deleteCart(Long userId) {
-        cartRepository.deleteByUserId(userId);
+    // Helper method to calculate the total price of all items in the cart
+    private void recalculateTotal(Cart cart) {
+        BigDecimal total = cart.getItems().stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        cart.setTotalCartValue(total);
     }
 }

@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.swiftcart</groupId>
-	<artifactId>product-service</artifactId>
+	<artifactId>cart-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>product-service</name>
-	<description>Demo project for Spring Boot</description>
+	<name>cart-service</name>
+	<description>Cart Service for SwiftCart</description>
 	<url/>
 	<licenses>
 		<license/>

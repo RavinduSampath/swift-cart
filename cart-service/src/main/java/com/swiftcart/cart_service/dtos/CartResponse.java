@@ -1,20 +1,11 @@
 package com.swiftcart.cart_service.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class CartResponse {
-
-    private Long id;
-    private Long userId;
-    private List<CartItemResponse> items = new ArrayList<>();
-    private BigDecimal totalCartValue;
-}
+public record CartResponse(
+        Long id,
+        Long userId,
+        List<CartItemResponse> items,
+        BigDecimal totalCartValue
+) {}
