@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { Filter } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { Product } from '@/lib/api';
@@ -7,14 +8,21 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 
 const Products = () => {
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBrand, setSelectedBrand] = useState<string>('');
+  const [selectedBrand, setSelectedBrand] = useState<string>(searchParams.get('brand') || '');
   const [priceRange, setPriceRange] = useState<string>('');
   const [movement, setMovement] = useState<string>('');
   const { userId } = useAuth();
   const toast = useToast();
+
+  // Sync brand from URL query param
+  useEffect(() => {
+    const brandParam = searchParams.get('brand') || '';
+    setSelectedBrand(brandParam);
+  }, [searchParams]);
 
   useEffect(() => {
     loadProducts();
