@@ -12,10 +12,8 @@ public class NotificationMapper {
         response.setId(notification.getId());
         response.setRecipientEmail(notification.getRecipientEmail());
         response.setSubject(notification.getSubject());
-        response.setMessage(notification.getMessage());
-        response.setType(notification.getType());
         response.setStatus(notification.getStatus());
-        response.setCreatedAt(notification.getCreatedAt());
+        response.setType(notification.getType());
         response.setSentAt(notification.getSentAt());
         return response;
     }

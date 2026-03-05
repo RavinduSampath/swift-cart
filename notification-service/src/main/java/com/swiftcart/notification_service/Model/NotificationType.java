@@ -1,6 +1,7 @@
 package com.swiftcart.notification_service.Model;
 
 public enum NotificationType {
-    PRODUCT_ADDED,
-    OFFER_ADDED
+    ORDER_CONFIRMATION,
+    SHIPPING_UPDATE,
+    WELCOME_MESSAGE
 }
