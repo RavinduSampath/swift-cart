@@ -2,20 +2,63 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Annotation profile for swiftcart" enabled="true">
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="api-gateway" />
+        <module name="service-registry" />
+      </profile>
+      <profile name="Annotation profile for SwiftCart Backend Monorepo" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
-        <module name="swiftcart" />
+        <module name="cart-service" />
+        <module name="identity_service" />
+        <module name="inventory-service" />
+        <module name="payment-service" />
+        <module name="order-service" />
+        <module name="warranty-service" />
+        <module name="shipping-service" />
+      </profile>
+      <profile name="Annotation profile for product-service (1)" enabled="true">
+        <sourceOutputDir name="../product-service/target/generated-sources/annotations" />
+        <sourceTestOutputDir name="../product-service/target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+        </processorPath>
+        <module name="product-service (1)" />
+      </profile>
+      <profile name="Annotation profile for review-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar" />
+        </processorPath>
+        <module name="review-service" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="swiftcart" options="-parameters" />
+      <module name="api-gateway" options="-parameters" />
+      <module name="cart-service" options="-parameters" />
+      <module name="identity_service" options="-parameters" />
+      <module name="inventory-service" options="-parameters" />
+      <module name="order-service" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
+      <module name="product-service (1)" options="-parameters" />
+      <module name="review-service" options="-parameters" />
+      <module name="service-registry" options="-parameters" />
+      <module name="shipping-service" options="-parameters" />
+      <module name="swiftcart" options="" />
+      <module name="warranty-service" options="-parameters" />
     </option>
   </component>
 </project>
