@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Star, ShoppingCart, ChevronLeft, Clock, Package } from 'lucide-react';
-import { api } from '@/lib/api';
-import type { Product, Review } from '@/lib/api';
+import { productService, cartService, reviewService } from '@/services';
+import type { Product, Review } from '@/services/types';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 
@@ -27,7 +27,7 @@ const ProductDetail = () => {
 
   const loadProductDetails = async (productId: number) => {
     try {
-      const response = await api.getProductById(productId);
+      const response = await productService.getProductById(productId);
       setProduct(response.data);
     } catch (error) {
       console.error('Failed to load product:', error);
@@ -38,7 +38,7 @@ const ProductDetail = () => {
 
   const loadReviews = async (productId: number) => {
     try {
-      const response = await api.getReviewsByProduct(productId);
+      const response = await reviewService.getProductReviews(productId);
       setReviews(response.data || []);
     } catch (error) {
       console.error('Failed to load reviews:', error);
@@ -51,7 +51,7 @@ const ProductDetail = () => {
       return;
     }
     try {
-      await api.addToCart(userId, product.id, quantity);
+      await cartService.addItemToCart(userId, product.id, quantity);
       toast.success('Added to cart!', `${quantity} item(s) added to your cart`);
       setTimeout(() => navigate('/cart'), 1000);
     } catch (error) {
@@ -70,7 +70,7 @@ const ProductDetail = () => {
       return;
     }
     try {
-      await api.addReview(product.id, userId, newReview.rating, newReview.comment);
+      await reviewService.addReview(product.id, userId, newReview.rating, newReview.comment);
       toast.success('Review submitted!', 'Thank you for your review');
       setNewReview({ rating: 5, comment: '' });
       loadReviews(product.id);

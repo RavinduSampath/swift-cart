@@ -11,8 +11,8 @@ import {
   Eye,
   ChevronRight,
 } from 'lucide-react';
-import { api } from '@/lib/api';
-import type { Product } from '@/lib/api';
+import { productService, cartService } from '@/services';
+import type { Product } from '@/services/types';
 import ProductCard from '@/components/ProductCard';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -30,7 +30,7 @@ const Home = () => {
 
   const loadProducts = async () => {
     try {
-      const response = await api.getAllProducts();
+      const response = await productService.getAllProducts();
       const all = response.data;
       setFeaturedProducts(all.slice(0, 6));
       setNewArrivals(all.slice(6, 10));
@@ -47,7 +47,7 @@ const Home = () => {
       return;
     }
     try {
-      await api.addToCart(userId, productId, 1);
+      await cartService.addItemToCart(userId, productId, 1);
       toast.success('Added to cart!', 'Product added to your cart successfully');
     } catch (error) {
       console.error('Failed to add to cart:', error);

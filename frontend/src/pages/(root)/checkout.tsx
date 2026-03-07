@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { CreditCard, Building, Smartphone, ArrowLeft, Check } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { api } from '@/lib/api';
-import type { Cart as CartType } from '@/lib/api';
+import { cartService, orderService } from '@/services';
+import type { Cart as CartType, ShippingAddress } from '@/services/types';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const Checkout = () => {
   const loadCart = async () => {
     if (!userId) return;
     try {
-      const response = await api.getCart(userId);
+      const response = await cartService.getCart(userId);
       if (!response.data.items || response.data.items.length === 0) {
         navigate('/cart');
         return;
@@ -86,12 +86,28 @@ const Checkout = () => {
     setProcessing(true);
 
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Clear cart
-      if (userId) {
-        await api.clearCart(userId);
+      // Build shipping address
+      const shippingAddress: ShippingAddress = {
+        fullName: formData.fullName,
+        addressLine1: formData.address,
+        city: formData.city,
+        state: formData.state,
+        postalCode: formData.zipCode,
+        country: formData.country,
+        phone: formData.phone,
+      };
+
+      // Place order via order service
+      if (userId && cart) {
+        await orderService.placeOrder(
+          userId,
+          cart.id,
+          shippingAddress,
+          paymentMethod.toUpperCase()
+        );
+        
+        // Clear cart after successful order
+        await cartService.clearCart(userId);
       }
       
       // Show success

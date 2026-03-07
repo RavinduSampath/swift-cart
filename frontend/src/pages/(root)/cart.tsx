@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
-import { api } from '@/lib/api';
-import type { Cart as CartType, CartItem } from '@/lib/api';
+import { cartService } from '@/services';
+import type { Cart as CartType, CartItem } from '@/services/types';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 
@@ -24,7 +24,7 @@ const Cart = () => {
   const loadCart = async () => {
     if (!userId) return;
     try {
-      const response = await api.getCart(userId);
+      const response = await cartService.getCart(userId);
       setCart(response.data);
     } catch (error) {
       console.error('Failed to load cart:', error);
@@ -38,7 +38,7 @@ const Cart = () => {
     if (!confirm('Are you sure you want to clear your cart?')) return;
 
     try {
-      await api.clearCart(userId);
+      await cartService.clearCart(userId);
       setCart(null);
       toast.success('Cart cleared', 'All items removed from your cart');
     } catch (error) {
