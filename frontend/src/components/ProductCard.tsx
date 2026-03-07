@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { ShoppingCart, Star } from 'lucide-react';
-import type { Product } from '@/lib/api';
+import type { Product } from '@/services/types';
 
 interface ProductCardProps {
   product: Product;
